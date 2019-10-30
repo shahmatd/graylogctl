@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+usage() {
+ 	echo "Usage: $0 [showalloc|showindices|showindexhealth|showclusterstat|unlockreadonly|shownodes]"
+	exit 1
+}
+
+if [ "$#" -ne 1 ]; then
+	usage
+fi
+
+myarg=$1
+
+case "$myarg" in 
+	"showalloc")
+		curl -XGET http://localhost:9200/_cat/allocation?v
+		;;
+	"showindices")
+		curl -X GET "localhost:9200/_cat/indices?v&health=green&pretty"
+		;;
+	"showindexhealth")
+		curl -XGET 'localhost:9200/_cat/health?v&pretty'
+		;;
+	"showclusterhealth")
+		curl -XGET 'localhost:9200/_cluster/health?pretty'
+		;;
+	"showclusterstat")
+		curl -XGET 'http://127.0.0.1:9200/_cluster/health?pretty=true'
+		;;
+	"unlockreadonly")
+		curl -XPUT -H "Content-Type: application/json" http://localhost:9200/_all/_settings -d '{"index.blocks.read_only_allow_delete": null}'
+		;;
+	"shownodes")
+		curl -XGET 'localhost:9200/_cat/nodes?v&pretty'
+		;;
+	*)
+		usage
+		;; 
+esac
